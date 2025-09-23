@@ -6,7 +6,7 @@ Provides embedding generation, simple chat, chat with history, and chat with too
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 import ollama
 
 # Configure logging
@@ -41,7 +41,7 @@ def generate_embedding(text: str, model: str = "nomic-embed-text") -> List[float
 
     try:
         response = ollama.embeddings(model=model, prompt=text)
-        return response['embedding']
+        return response["embedding"]
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
         raise ConnectionError("Ollama service is unavailable")
@@ -72,8 +72,10 @@ def simple_chat(prompt: str, model: str = "llama3.2") -> str:
         raise ValueError(f"Invalid model '{model}'")
 
     try:
-        response = ollama.chat(model=model, messages=[{'role': 'user', 'content': prompt}])
-        return response['message']['content']
+        response = ollama.chat(
+            model=model, messages=[{"role": "user", "content": prompt}]
+        )
+        return response["message"]["content"]
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
         raise ConnectionError("Ollama service is unavailable")
@@ -99,11 +101,11 @@ def chat_with_history(history: List[Dict[str, Any]], model: str = "llama3.2") ->
 
     # Validate history format
     for msg in history:
-        if not isinstance(msg, dict) or 'role' not in msg or 'content' not in msg:
+        if not isinstance(msg, dict) or "role" not in msg or "content" not in msg:
             raise ValueError("Each history message must have 'role' and 'content' keys")
-        if msg['role'] not in ['user', 'assistant']:
+        if msg["role"] not in ["user", "assistant"]:
             raise ValueError("Message role must be 'user' or 'assistant'")
-        if not msg['content'] or not isinstance(msg['content'], str):
+        if not msg["content"] or not isinstance(msg["content"], str):
             raise ValueError("Message content must be a non-empty string")
 
     try:
@@ -114,13 +116,15 @@ def chat_with_history(history: List[Dict[str, Any]], model: str = "llama3.2") ->
 
     try:
         response = ollama.chat(model=model, messages=history)
-        return response['message']['content']
+        return response["message"]["content"]
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
         raise ConnectionError("Ollama service is unavailable")
 
 
-def chat_with_tools(prompt: str, tools: List[Dict[str, Any]], model: str = "llama3.2") -> Dict[str, Any]:
+def chat_with_tools(
+    prompt: str, tools: List[Dict[str, Any]], model: str = "llama3.2"
+) -> Dict[str, Any]:
     """
     Generate AI response that may include tool calls.
 
@@ -144,7 +148,11 @@ def chat_with_tools(prompt: str, tools: List[Dict[str, Any]], model: str = "llam
 
     # Validate tools format
     for tool in tools:
-        if not isinstance(tool, dict) or 'name' not in tool or 'description' not in tool:
+        if (
+            not isinstance(tool, dict)
+            or "name" not in tool
+            or "description" not in tool
+        ):
             raise ValueError("Each tool must have 'name' and 'description' keys")
 
     try:
@@ -156,20 +164,19 @@ def chat_with_tools(prompt: str, tools: List[Dict[str, Any]], model: str = "llam
     try:
         # Note: Ollama's tool calling support may vary by model
         # This is a basic implementation - advanced tool calling may need model-specific handling
-        messages = [{'role': 'user', 'content': prompt}]
+        messages = [{"role": "user", "content": prompt}]
 
         # Add tools to the request if supported
         response = ollama.chat(model=model, messages=messages, tools=tools)
 
-        result = {
-            'content': response['message']['content']
-        }
+        result = {"content": response["message"]["content"]}
 
         # Check for tool calls (format may vary)
-        if 'tool_calls' in response['message']:
-            result['tool_calls'] = response['message']['tool_calls']
+        if "tool_calls" in response["message"]:
+            result["tool_calls"] = response["message"]["tool_calls"]
 
         return result
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
         raise ConnectionError("Ollama service is unavailable")
+

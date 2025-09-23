@@ -1,1 +1,7 @@
 .opencode/
+src/__pycache__
+tests/contract/__pycache__
+tests/integration/__pycache__
+tests/unit/__pycache__
+.specify
+.specify

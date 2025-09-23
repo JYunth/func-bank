@@ -6,3 +6,4 @@ Requires-Dist: black>=25.9.0
 Requires-Dist: flake8>=7.3.0
 Requires-Dist: ollama>=0.2.0
 Requires-Dist: pytest>=8.4.2
+Requires-Dist: requests>=2.32.5
