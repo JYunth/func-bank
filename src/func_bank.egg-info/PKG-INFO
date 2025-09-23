@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: func-bank
+Version: 0.1.0
+Summary: Function bank for reusable components
+Requires-Dist: black>=25.9.0
+Requires-Dist: flake8>=7.3.0
+Requires-Dist: ollama>=0.2.0
+Requires-Dist: pytest>=8.4.2

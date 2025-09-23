@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "func-bank"
+version = "0.1.0"
+description = "Function bank for reusable components"
+dependencies = [
+    "black>=25.9.0",
+    "flake8>=7.3.0",
+    "ollama>=0.2.0",
+    "pytest>=8.4.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]

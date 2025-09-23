@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/__init__.py
+src/ollama_integration.py
+src/func_bank.egg-info/PKG-INFO
+src/func_bank.egg-info/SOURCES.txt
+src/func_bank.egg-info/dependency_links.txt
+src/func_bank.egg-info/requires.txt
+src/func_bank.egg-info/top_level.txt
