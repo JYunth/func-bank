@@ -5,5 +5,9 @@ Summary: Function bank for reusable components
 Requires-Dist: black>=25.9.0
 Requires-Dist: flake8>=7.3.0
 Requires-Dist: ollama>=0.2.0
+Requires-Dist: pgvector>=0.3.0
+Requires-Dist: psycopg2-binary>=2.9.10
+Requires-Dist: pyjwt>=2.10.1
 Requires-Dist: pytest>=8.4.2
 Requires-Dist: requests>=2.32.5
+Requires-Dist: sqlalchemy>=2.0.43

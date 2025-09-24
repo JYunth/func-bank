@@ -1,2 +1,2 @@
-__init__
+func_bank
 ollama_integration

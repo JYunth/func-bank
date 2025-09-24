@@ -8,6 +8,7 @@ Provides embedding generation, simple chat, chat with history, and chat with too
 import logging
 from typing import List, Dict, Any
 import ollama
+from func_bank.exceptions import ValidationError, ServiceError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,25 +27,25 @@ def generate_embedding(text: str, model: str = "nomic-embed-text") -> List[float
         List[float]: Vector representation of the input text
 
     Raises:
-        ValueError: If text is empty or model is invalid
-        ConnectionError: If Ollama service is unavailable
+        ValidationError: If text is empty or model is invalid
+        ServiceError: If Ollama service is unavailable
     """
     if not text or not text.strip():
-        raise ValueError("Text cannot be empty")
+        raise ValidationError("Text cannot be empty")
 
     try:
         # Check if model exists (this will raise an error if not)
         ollama.show(model)
     except Exception as e:
         logger.error(f"Invalid model '{model}': {e}")
-        raise ValueError(f"Invalid model '{model}'")
+        raise ValidationError(f"Invalid model '{model}'")
 
     try:
         response = ollama.embeddings(model=model, prompt=text)
         return response["embedding"]
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
-        raise ConnectionError("Ollama service is unavailable")
+        raise ServiceError("Ollama service is unavailable")
 
 
 def simple_chat(prompt: str, model: str = "llama3.2") -> str:
@@ -59,17 +60,17 @@ def simple_chat(prompt: str, model: str = "llama3.2") -> str:
         str: AI-generated response text
 
     Raises:
-        ValueError: If prompt is empty or model is invalid
-        ConnectionError: If Ollama service is unavailable
+        ValidationError: If prompt is empty or model is invalid
+        ServiceError: If Ollama service is unavailable
     """
     if not prompt or not prompt.strip():
-        raise ValueError("Prompt cannot be empty")
+        raise ValidationError("Prompt cannot be empty")
 
     try:
         ollama.show(model)
     except Exception as e:
         logger.error(f"Invalid model '{model}': {e}")
-        raise ValueError(f"Invalid model '{model}'")
+        raise ValidationError(f"Invalid model '{model}'")
 
     try:
         response = ollama.chat(
@@ -78,7 +79,7 @@ def simple_chat(prompt: str, model: str = "llama3.2") -> str:
         return response["message"]["content"]
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
-        raise ConnectionError("Ollama service is unavailable")
+        raise ServiceError("Ollama service is unavailable")
 
 
 def chat_with_history(history: List[Dict[str, Any]], model: str = "llama3.2") -> str:
@@ -93,33 +94,33 @@ def chat_with_history(history: List[Dict[str, Any]], model: str = "llama3.2") ->
         str: AI-generated response text considering history
 
     Raises:
-        ValueError: If history is invalid or model is invalid
-        ConnectionError: If Ollama service is unavailable
+        ValidationError: If history is invalid or model is invalid
+        ServiceError: If Ollama service is unavailable
     """
     if not history or not isinstance(history, list):
-        raise ValueError("History must be a non-empty list")
+        raise ValidationError("History must be a non-empty list")
 
     # Validate history format
     for msg in history:
         if not isinstance(msg, dict) or "role" not in msg or "content" not in msg:
-            raise ValueError("Each history message must have 'role' and 'content' keys")
+            raise ValidationError("Each history message must have 'role' and 'content' keys")
         if msg["role"] not in ["user", "assistant"]:
-            raise ValueError("Message role must be 'user' or 'assistant'")
+            raise ValidationError("Message role must be 'user' or 'assistant'")
         if not msg["content"] or not isinstance(msg["content"], str):
-            raise ValueError("Message content must be a non-empty string")
+            raise ValidationError("Message content must be a non-empty string")
 
     try:
         ollama.show(model)
     except Exception as e:
         logger.error(f"Invalid model '{model}': {e}")
-        raise ValueError(f"Invalid model '{model}'")
+        raise ValidationError(f"Invalid model '{model}'")
 
     try:
         response = ollama.chat(model=model, messages=history)
         return response["message"]["content"]
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
-        raise ConnectionError("Ollama service is unavailable")
+        raise ServiceError("Ollama service is unavailable")
 
 
 def chat_with_tools(
@@ -137,14 +138,14 @@ def chat_with_tools(
         Dict[str, Any]: Response containing 'content' and optionally 'tool_calls'
 
     Raises:
-        ValueError: If prompt is empty, tools invalid, or model invalid
-        ConnectionError: If Ollama service is unavailable
+        ValidationError: If prompt is empty, tools invalid, or model invalid
+        ServiceError: If Ollama service is unavailable
     """
     if not prompt or not prompt.strip():
-        raise ValueError("Prompt cannot be empty")
+        raise ValidationError("Prompt cannot be empty")
 
     if not tools or not isinstance(tools, list):
-        raise ValueError("Tools must be a non-empty list")
+        raise ValidationError("Tools must be a non-empty list")
 
     # Validate tools format
     for tool in tools:
@@ -153,13 +154,13 @@ def chat_with_tools(
             or "name" not in tool
             or "description" not in tool
         ):
-            raise ValueError("Each tool must have 'name' and 'description' keys")
+            raise ValidationError("Each tool must have 'name' and 'description' keys")
 
     try:
         ollama.show(model)
     except Exception as e:
         logger.error(f"Invalid model '{model}': {e}")
-        raise ValueError(f"Invalid model '{model}'")
+        raise ValidationError(f"Invalid model '{model}'")
 
     try:
         # Note: Ollama's tool calling support may vary by model
@@ -178,5 +179,5 @@ def chat_with_tools(
         return result
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
-        raise ConnectionError("Ollama service is unavailable")
+        raise ServiceError("Ollama service is unavailable")
 
