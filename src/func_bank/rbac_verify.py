@@ -23,7 +23,7 @@ def verify_role(token: str, required_role: str, secret: str) -> bool:
         payload = decode_jwt(token, secret)
         if payload is None:
             duration = time.time() - start_time
-            logger.warning("Role verification failed: token invalid or expired", extra={"duration": duration})
+            logger.warning("Role verification failed: token expired", extra={"duration": duration})
             return False
         role = payload.get("role")
         if role is None:
@@ -37,4 +37,6 @@ def verify_role(token: str, required_role: str, secret: str) -> bool:
     except Exception as e:
         duration = time.time() - start_time
         logger.error("Role verification failed: unexpected error", extra={"duration": duration, "error": str(e)})
-        return False
+        if isinstance(e, AuthenticationError):
+            raise
+        raise AuthenticationError("Failed to verify role")

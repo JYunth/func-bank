@@ -1,5 +1,5 @@
 import pytest
-from src.ollama_integration import simple_chat
+from func_bank.ollama_integration import simple_chat
 
 
 def test_simple_chat_response_scenario():

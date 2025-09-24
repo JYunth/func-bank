@@ -83,9 +83,9 @@
 
 ## Phase 3.4: Integration
 - [x] T034 Set up database connection and session management in src/func_bank/db_connection.py
-- [ ] T035 Implement structured logging and metrics for all components
-- [ ] T036 Add error handling and well-documented exceptions across all functions
-- [ ] T037 Integrate components: ensure API uses DB and RBAC seamlessly
+- [x] T035 Implement structured logging and metrics for all components
+- [x] T036 Add error handling and well-documented exceptions across all functions
+- [x] T037 Integrate components: ensure API uses DB and RBAC seamlessly
 
 ## Phase 3.5: Polish
 - [x] T038 [P] Unit tests for validation and edge cases in tests/unit/test_validation.py
@@ -152,4 +152,4 @@ Task: "Implement create_record function in src/func_bank/db_create.py"
 - [ ] All tests come before implementation
 - [ ] Parallel tasks truly independent
 - [ ] Each task specifies exact file path
-- [ ] No task modifies same file as another [P] task
+- [x] No task modifies same file as another [P] task

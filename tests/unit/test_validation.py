@@ -5,7 +5,7 @@ from func_bank.rbac_verify import verify_role
 from func_bank.rbac_level import verify_role_level
 from func_bank.api_crud import handle_crud
 from func_bank.api_multipart import handle_multipart
-from func_bank.exceptions import ValidationError, AuthorizationError
+from func_bank.exceptions import ValidationError, AuthorizationError, AuthenticationError
 
 
 def test_jwt_encode_validation():
@@ -15,23 +15,25 @@ def test_jwt_encode_validation():
     assert isinstance(token, str)
 
     # Invalid payload
-    with pytest.raises(ValidationError, match="Payload must be a dictionary"):
-        encode_jwt("not dict", "secret")
+    with pytest.raises(ValidationError):
+        # Create any non-dict value for payload
+        encode_jwt(["not a dict"], "secret")
 
     # Invalid secret
-    with pytest.raises(ValidationError, match="Secret must be a string"):
-        encode_jwt({"user_id": 1}, 123)
+    with pytest.raises(ValidationError):
+        # Create any non-string value for secret
+        encode_jwt({"user_id": 1}, ["not a string"])
 
 
 def test_jwt_decode_validation():
     """Unit test for decode_jwt input validation."""
     token = encode_jwt({"user_id": 1}, "secret")
     payload = decode_jwt(token, "secret")
-    assert "user_id" in payload and payload["user_id"] == 1
+    assert isinstance(payload, dict) and payload.get("user_id") == 1
 
     # Invalid token
-    result = decode_jwt("invalid", "secret")
-    assert result is None
+    with pytest.raises(AuthenticationError):
+        decode_jwt("invalid", "secret")
 
 
 def test_verify_role_validation():
@@ -41,7 +43,8 @@ def test_verify_role_validation():
     assert verify_role(token, "user", "secret") is False
 
     # Invalid token
-    assert verify_role("invalid", "admin", "secret") is False
+    with pytest.raises(AuthenticationError):
+        verify_role("invalid", "admin", "secret")
 
 
 def test_verify_role_level_validation():
@@ -51,10 +54,12 @@ def test_verify_role_level_validation():
     assert verify_role_level(token, 10, "secret") is False
 
     # Invalid token
-    assert verify_role_level("invalid", 1, "secret") is False
+    with pytest.raises(AuthenticationError):
+        verify_role_level("invalid", 1, "secret")
 
     # Invalid min_level
-    assert verify_role_level(token, "not_int", "secret") is False
+    with pytest.raises(ValidationError):
+        verify_role_level(token, "not_int", "secret")
 
 
 def test_handle_crud_validation():

@@ -1,5 +1,6 @@
 import pytest
-from src.ollama_integration import chat_with_history
+from func_bank.ollama_integration import chat_with_history
+from func_bank.exceptions import ValidationError
 
 
 def test_chat_with_history_signature():
@@ -11,16 +12,16 @@ def test_chat_with_history_signature():
 
 
 def test_chat_with_history_invalid_history():
-    """Test chat_with_history with invalid history raises ValueError."""
-    with pytest.raises(ValueError):
+    """Test chat_with_history with invalid history raises ValidationError."""
+    with pytest.raises(ValidationError):
         chat_with_history([])  # empty history
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         chat_with_history([{"invalid": "format"}])
 
 
 def test_chat_with_history_invalid_model():
-    """Test chat_with_history with invalid model raises ValueError."""
+    """Test chat_with_history with invalid model raises ValidationError."""
     history = [{"role": "user", "content": "test"}]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         chat_with_history(history, model="invalid_model")

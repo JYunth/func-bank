@@ -1,5 +1,20 @@
 import pytest
+from sqlalchemy import text
 from func_bank.db_files import store_file
+from func_bank.db_connection import engine
+
+# Create files table if it doesn't exist
+with engine.connect() as conn:
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS files (
+            id SERIAL PRIMARY KEY,
+            filename VARCHAR(255) NOT NULL,
+            data BYTEA NOT NULL,
+            metadata JSONB,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        )
+    """))
+    conn.commit()
 
 def test_store_file_success():
     # This test will fail until implementation

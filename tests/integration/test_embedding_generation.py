@@ -1,5 +1,5 @@
 import pytest
-from src.ollama_integration import generate_embedding
+from func_bank.ollama_integration import generate_embedding
 
 
 def test_embedding_generation_scenario():

@@ -1,4 +1,4 @@
-from sqlalchemy import MetaData, Table, insert
+from sqlalchemy import MetaData, Table, text
 from sqlalchemy.exc import SQLAlchemyError
 import json
 from .exceptions import ValidationError, DatabaseError
@@ -37,29 +37,22 @@ def store_file(filename: str, data: bytes, metadata: dict = {}) -> str:
         raise ValidationError("File size exceeds 10MB limit")
 
     try:
-        with get_session() as session:
-            metadata_obj = MetaData()
-            table_obj = Table('files', metadata_obj, autoload_with=engine)
-
-            # Prepare data
-            insert_data = {
-                'filename': filename,
-                'data': data,
-                'metadata': json.dumps(metadata)
-            }
-
-            # Insert
-            stmt = insert(table_obj).values(**insert_data)
-            result = session.execute(stmt)
-            session.commit()
-
-            # Get the inserted primary key
-            if result.inserted_primary_key:
-                duration = time.time() - start_time
-                logger.info("File stored successfully", extra={"filename": filename, "id": str(result.inserted_primary_key[0]), "duration": duration, "size": len(data)})
-                return str(result.inserted_primary_key[0])
-            else:
-                raise DatabaseError("No primary key returned")
+        with engine.connect() as conn:
+            result = conn.execute(text("""
+                INSERT INTO files (filename, data, metadata)
+                VALUES (:filename, :data, :metadata)
+                RETURNING id
+            """), {
+                "filename": filename,
+                "data": data,
+                "metadata": json.dumps(metadata)
+            })
+            conn.commit()
+            
+            file_id = result.scalar_one()
+            duration = time.time() - start_time
+            logger.info("File stored successfully", extra={"filename": filename, "id": str(file_id), "duration": duration, "size": len(data)})
+            return str(file_id)
     except SQLAlchemyError as e:
         duration = time.time() - start_time
         logger.error("Database error during store", extra={"filename": filename, "duration": duration, "error": str(e)}, exc_info=True)

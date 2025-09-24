@@ -1,5 +1,6 @@
 import pytest
-from src.ollama_integration import generate_embedding
+from func_bank.ollama_integration import generate_embedding
+from func_bank.exceptions import ValidationError
 
 
 def test_generate_embedding_signature():
@@ -13,12 +14,12 @@ def test_generate_embedding_signature():
 
 
 def test_generate_embedding_empty_text():
-    """Test generate_embedding with empty text raises ValueError."""
-    with pytest.raises(ValueError):
+    """Test generate_embedding with empty text raises ValidationError."""
+    with pytest.raises(ValidationError):
         generate_embedding("")
 
 
 def test_generate_embedding_invalid_model():
-    """Test generate_embedding with invalid model raises ValueError."""
-    with pytest.raises(ValueError):
+    """Test generate_embedding with invalid model raises ValidationError."""
+    with pytest.raises(ValidationError):
         generate_embedding("test", model="invalid_model")

@@ -7,7 +7,7 @@ from func_bank.db_delete import delete_record
 
 def test_crud_operations():
     """Integration test for full CRUD cycle: create, read, update, read, delete, verify deletion."""
-    table = "users"
+    table = "test_users"
     initial_data = {"name": "John", "email": "john@example.com"}
 
     # Create a record

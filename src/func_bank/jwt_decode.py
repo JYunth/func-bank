@@ -25,7 +25,11 @@ def decode_jwt(token: str, secret: str) -> dict | None:
             "JWT decode failed: expired signature", extra={"duration": duration}
         )
         return None
-    except Exception:
+    except jwt.InvalidTokenError:
         duration = time.time() - start_time
         logger.error("JWT decode failed: invalid or malformed token", extra={"duration": duration})
-        return None
+        raise AuthenticationError("Invalid or malformed token")
+    except Exception as e:
+        duration = time.time() - start_time
+        logger.error("JWT decode failed", extra={"duration": duration, "error": str(e)})
+        raise AuthenticationError("Failed to decode token")

@@ -1,6 +1,7 @@
 import pytest
 from func_bank.api_crud import handle_crud
 from func_bank.jwt_encode import encode_jwt
+from func_bank.exceptions import AuthorizationError
 
 def test_api_with_rbac_success():
     """Test API CRUD with successful RBAC verification."""
@@ -32,5 +33,5 @@ def test_api_with_rbac_access_denied():
     table = "users"
     data = {"name": "John", "email": "john@example.com"}
 
-    with pytest.raises(ValueError, match="Access denied"):
+    with pytest.raises(AuthorizationError, match="Access denied: insufficient permissions"):
         handle_crud("POST", table, data, token=token, secret=secret, required_role="admin")

@@ -1,5 +1,6 @@
 import pytest
-from src.ollama_integration import simple_chat
+from func_bank.ollama_integration import simple_chat
+from func_bank.exceptions import ValidationError
 
 
 def test_simple_chat_signature():
@@ -11,12 +12,12 @@ def test_simple_chat_signature():
 
 
 def test_simple_chat_empty_prompt():
-    """Test simple_chat with empty prompt raises ValueError."""
-    with pytest.raises(ValueError):
+    """Test simple_chat with empty prompt raises ValidationError."""
+    with pytest.raises(ValidationError):
         simple_chat("")
 
 
 def test_simple_chat_invalid_model():
-    """Test simple_chat with invalid model raises ValueError."""
-    with pytest.raises(ValueError):
+    """Test simple_chat with invalid model raises ValidationError."""
+    with pytest.raises(ValidationError):
         simple_chat("test", model="invalid_model")

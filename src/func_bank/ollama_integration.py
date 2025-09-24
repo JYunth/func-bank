@@ -180,4 +180,3 @@ def chat_with_tools(
     except Exception as e:
         logger.error(f"Ollama service error: {e}")
         raise ServiceError("Ollama service is unavailable")
-

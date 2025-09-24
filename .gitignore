@@ -1,9 +1,38 @@
-.opencode/
-src/__pycache__
-tests/contract/__pycache__
-tests/integration/__pycache__
-tests/unit/__pycache__
-.specify
-.specify
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# opencode tool data
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+.opencode/
+.specify

@@ -1,8 +1,10 @@
 README.md
 pyproject.toml
 src/ollama_integration.py
+src/func_bank/__init__.py
 src/func_bank/api_crud.py
 src/func_bank/api_multipart.py
+src/func_bank/db_connection.py
 src/func_bank/db_create.py
 src/func_bank/db_delete.py
 src/func_bank/db_files.py
@@ -13,6 +15,7 @@ src/func_bank/db_vector.py
 src/func_bank/exceptions.py
 src/func_bank/jwt_decode.py
 src/func_bank/jwt_encode.py
+src/func_bank/ollama_integration.py
 src/func_bank/rbac_level.py
 src/func_bank/rbac_verify.py
 src/func_bank.egg-info/PKG-INFO

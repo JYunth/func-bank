@@ -1,5 +1,23 @@
 import pytest
+from sqlalchemy import text
 from func_bank.db_vector import vector_search
+from func_bank.db_connection import engine
+
+# Add embedding column as JSONB for testing
+with engine.connect() as conn:
+    conn.execute(text("""
+        ALTER TABLE test_table 
+        ADD COLUMN IF NOT EXISTS embedding JSONB
+    """))
+    conn.commit()
+
+    # Insert test data with embeddings
+    conn.execute(text("""
+        UPDATE test_table
+        SET embedding = :embedding
+        WHERE id = 1
+    """), {"embedding": '[0.1,0.1,0.1]'})
+    conn.commit()
 
 def test_vector_search_success():
     # This test will fail until implementation

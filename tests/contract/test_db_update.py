@@ -1,13 +1,24 @@
 import pytest
 from func_bank.db_update import update_record
 
+import pytest
+from sqlalchemy import text
+from func_bank.db_update import update_record
+from func_bank.db_connection import engine
+
 def test_update_record_success():
-    # Assuming a test database setup with a record to update
-    # This test will fail until implementation
+    # Create test record first
+    with engine.connect() as conn:
+        result = conn.execute(text(
+            "INSERT INTO test_table (name, value) VALUES ('test_update', 100) RETURNING id"
+        ))
+        test_id = result.scalar_one()
+        conn.commit()
+    
+    # Now try to update it
     table = "test_table"
-    id = 1
     data = {"name": "updated_name", "value": 42}
-    result = update_record(table, id, data)
+    result = update_record(table, test_id, data)
     assert result is True
 
 def test_update_record_not_found():

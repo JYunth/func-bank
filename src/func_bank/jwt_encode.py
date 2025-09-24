@@ -6,7 +6,9 @@ import time
 
 logger = logging.getLogger(__name__)
 
-def encode_jwt(payload: dict, secret: str, expires_hours: int = 24) -> str:
+from typing import Any
+
+def encode_jwt(payload: Any, secret: Any, expires_hours: int = 24) -> str:
     """
     Encodes a JWT token with the given payload and secret, adding an expiration time.
 
@@ -30,9 +32,10 @@ def encode_jwt(payload: dict, secret: str, expires_hours: int = 24) -> str:
         logger.error("Invalid secret type for JWT encode")
         raise ValidationError("Secret must be a string")
 
-    expiration = datetime.now(timezone.utc) + timedelta(hours=expires_hours)
     payload_with_exp = payload.copy()
-    payload_with_exp['exp'] = expiration
+    if 'exp' not in payload_with_exp:
+        expiration = int((datetime.now(timezone.utc) + timedelta(hours=expires_hours)).timestamp())
+        payload_with_exp['exp'] = expiration
 
     token = jwt.encode(payload_with_exp, secret, algorithm='HS256')
     duration = time.time() - start_time

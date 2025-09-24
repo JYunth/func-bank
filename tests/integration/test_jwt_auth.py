@@ -10,7 +10,10 @@ def test_jwt_auth_success():
     secret = "my_secret_key"
     token = encode_jwt(payload, secret)
     decoded_payload = decode_jwt(token, secret)
-    assert decoded_payload == payload
+    assert decoded_payload is not None
+    # Remove exp field for comparison since it's added automatically
+    decoded_payload_no_exp = {k: v for k, v in decoded_payload.items() if k != 'exp'}
+    assert decoded_payload_no_exp == payload
 
 
 def test_jwt_auth_expired_token():

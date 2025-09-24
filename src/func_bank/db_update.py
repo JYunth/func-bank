@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, update
+from sqlalchemy import MetaData, Table, update, select, text
 from sqlalchemy.exc import SQLAlchemyError
 from .exceptions import ValidationError, DatabaseError
 import logging
@@ -29,46 +29,19 @@ def update_record(table: str, id: int, data: dict) -> bool:
     logger.info("Starting record update", extra={"table": table, "id": id})
     start_time = time.time()
     try:
-        with get_session() as session:
-            # Inspect table
-            metadata = MetaData()
-            table_obj = Table(table, metadata, autoload_with=engine)
+        with engine.connect() as conn:
+            result = conn.execute(text(f"""
+                UPDATE {table}
+                SET {', '.join(f'{k} = :{k}' for k in data)}
+                WHERE id = :id
+                RETURNING id
+            """), {**data, "id": id})
+            conn.commit()
             
-            # Check data keys match columns
-            columns = [col.name for col in table_obj.columns]
-            if not all(key in columns for key in data.keys()):
-                raise ValidationError(f"Data keys do not match table columns: {columns}")
-            
-            # Prepare update statement
-            stmt = update(table_obj).where(table_obj.c.id == id)
-            
-            # Handle optimistic locking if version column exists
-            if 'version' in columns:
-                if 'version' not in data:
-                    raise ValidationError("Version required for optimistic locking")
-                stmt = stmt.where(table_obj.c.version == data['version'])
-                # Update all data except version
-                update_data = {k: v for k, v in data.items() if k != 'version'}
-                stmt = stmt.values(**update_data)
-            else:
-                stmt = stmt.values(**data)
-            
-            # Execute update
-            result = session.execute(stmt)
-            session.commit()
-            
-            duration = time.time() - start_time
             if result.rowcount > 0:
-                logger.info("Record updated successfully", extra={"table": table, "id": id, "duration": duration})
                 return True
-            else:
-                # If version exists and no rows updated, it's a conflict
-                if 'version' in columns:
-                    logger.warning("Version conflict during update", extra={"table": table, "id": id, "duration": duration})
-                    raise DatabaseError("Version conflict: record has been modified")
-                else:
-                    logger.info("Record not found for update", extra={"table": table, "id": id, "duration": duration})
-                    return False  # Not found
+            return False
+            
     except SQLAlchemyError as e:
         duration = time.time() - start_time
         logger.error("Database error during update", extra={"table": table, "id": id, "duration": duration, "error": str(e)}, exc_info=True)
